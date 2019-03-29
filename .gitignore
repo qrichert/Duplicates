@@ -11,10 +11,11 @@
 /db/*.sqlite3
 /db/*.sqlite3-journal
 
-# Ignore all logfiles and tempfiles.
+# Ignore all log files, cache file and temp files.
 /log/*
 !/log/.keep
 /tmp
+__pycache__
 
 .DS_Store
 .DS_Store?
@@ -25,7 +26,6 @@ ehthumbs.db
 Thumbs.db
 .idea
 venv
-__pycache__
 
 /_BACKUP_/
 /_FACTORY_/
