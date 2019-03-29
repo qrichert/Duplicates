@@ -25,6 +25,7 @@ ehthumbs.db
 Thumbs.db
 .idea
 venv
+__pycache__
 
 /_BACKUP_/
 /_FACTORY_/
