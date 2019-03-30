@@ -1,12 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-LANG = 'en'
-
-if LANG == 'fr':
-	import translation.fr as tr
-else:  # English is default
-	import translation.en as tr
+from lang import *
 
 
 class SearchWindow(tk.Frame):
