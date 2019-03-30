@@ -32,7 +32,7 @@ class MainWindow(tk.Frame):
 		# Attributes
 		self.m_parent = parent
 		self.m_folders = []
-		self.m_foldersFormattedNames = []
+		self.m_foldersFormattedName = []
 		self.m_lastFolder = None
 
 		# Main window layout
@@ -45,15 +45,21 @@ class MainWindow(tk.Frame):
 		self.m_foldersListFrame = tk.Frame(self.m_mainLayout, bg='white', bd=0)
 		self.m_foldersListFrame.pack(fill=tk.X)
 
-		self.m_foldersList = tk.Listbox(self.m_foldersListFrame, bg='white', bd=0, width=30)
+		self.m_foldersList = tk.Listbox(self.m_foldersListFrame, bg='white', bd=0, width=30, selectmode=tk.EXTENDED)
+		self.m_foldersList['activestyle'] = 'none'
+		self.m_foldersList['selectbackground'] = '#2257c9'
+		self.m_foldersList['selectforeground'] = 'white'
+		self.m_foldersList['selectborderwidth'] = 0
 		self.m_foldersList.pack(fill=tk.BOTH, padx=2, pady=2)
+		self.m_foldersList.bind('<BackSpace>', self.removeFolders)
+		self.m_foldersList.bind('<Delete>', self.removeFolders)
 
 		self.m_buttonsLayout = tk.Frame(self.m_mainLayout)
 		self.m_buttonsLayout.pack(side=tk.RIGHT)
 
 		self.m_removeFolderButton = ttk.Button(self.m_buttonsLayout, text='-')
 		self.m_removeFolderButton.pack(side=tk.RIGHT)
-		self.m_removeFolderButton.bind('<Button-1>', self.removeFolder)
+		self.m_removeFolderButton.bind('<Button-1>', self.removeFolders)
 
 		self.m_addFolderButton = ttk.Button(self.m_buttonsLayout, text='+')
 		self.m_addFolderButton.pack(side=tk.RIGHT)
@@ -108,29 +114,44 @@ class MainWindow(tk.Frame):
 		# if tail is empty, head = full path -> get folder name (head doesn't have a trailing / at this point)
 		folder = tail if tail != '' else ntpath.basename(head)
 
-		self.m_foldersFormattedNames.append(folder)
+		self.m_foldersFormattedName.append(folder)
 		self.m_foldersList.insert(tk.END, folder)
 
 	def removeChildrenOfFolder(self, folder):
 		foldersToRemove = []
-		foldersFormattedNamesToRemove = []
+		foldersFormattedNameToRemove = []
 
 		i = 0
 		for f in self.m_folders:
 			if f.startswith(folder):
 				# We don't pop it straight away not to mess up with the loop
 				foldersToRemove.append(self.m_folders[i])
-				foldersFormattedNamesToRemove.append(self.m_foldersFormattedNames[i])
+				foldersFormattedNameToRemove.append(self.m_foldersFormattedName[i])
 			i += 1
-
-		print(foldersToRemove)
-		print(foldersFormattedNamesToRemove)
 
 		for f in foldersToRemove:
 			self.m_folders.remove(f)
 
-		for f in foldersFormattedNamesToRemove:
-			self.m_foldersFormattedNames.remove(f)
+		for f in foldersFormattedNameToRemove:
+			self.m_foldersFormattedName.remove(f)
+
+		self.rebuildFoldersList()
+
+	def removeFolders(self, event=None):
+		foldersToRemoveIndexes = self.m_foldersList.curselection()
+
+		foldersToRemove = []
+		foldersFormattedNameToRemove = []
+
+		for f in foldersToRemoveIndexes:
+			foldersToRemove.append(self.m_folders[f])
+			foldersFormattedNameToRemove.append(self.m_foldersFormattedName[f])
+
+		for f in foldersToRemove:
+			self.m_folders.remove(f)
+
+		for f in foldersFormattedNameToRemove:
+			self.m_foldersFormattedName.remove(f)
 
 		self.rebuildFoldersList()
 
@@ -138,19 +159,5 @@ class MainWindow(tk.Frame):
 		"""Clears the folder list display and re-fills it properly"""
 		self.m_foldersList.delete(0, tk.END)
 
-		for f in self.m_foldersFormattedNames:
+		for f in self.m_foldersFormattedName:
 			self.m_foldersList.insert(tk.END, f)
-
-	def removeFolder(self, event=None):
-		return
-
-	def setCurrentFolder(self, folder):
-		self.CURRENT_FOLDER = folder
-
-		if self.CURRENT_FOLDER is None or self.CURRENT_FOLDER == '':
-			self.currentFolderLabel['text'] = tr.SELECT_FOLDER_HELP_LABEL
-		else:
-			if len(self.CURRENT_FOLDER) <= 42:
-				self.currentFolderLabel['text'] = self.CURRENT_FOLDER
-			else:
-				self.currentFolderLabel['text'] = '...' + self.CURRENT_FOLDER[-39:]
