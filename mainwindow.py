@@ -10,6 +10,8 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 
+from searchwindow import *
+
 LANG = 'en'
 
 if LANG == 'fr':
@@ -22,7 +24,7 @@ class MainWindow(tk.Frame):
 	def __init__(self, parent):
 		tk.Frame.__init__(self, parent)
 
-	# Constants
+		# Constants
 		self.DEFAULT_PADDING = 7
 
 		# Attributes
@@ -35,7 +37,7 @@ class MainWindow(tk.Frame):
 		self.m_mainLayout = tk.Frame(self)
 		self.m_mainLayout.pack(padx=self.DEFAULT_PADDING, pady=self.DEFAULT_PADDING)
 
-		self.m_helpLabel = tk.Label(self.m_mainLayout, text=tr.SELECT_FOLDER_HELP_LABEL, anchor=tk.W)
+		self.m_helpLabel = tk.Label(self.m_mainLayout, text=tr.MW_HELP_LABEL, anchor=tk.W)
 		self.m_helpLabel.pack(fill=tk.X, pady=(0, self.DEFAULT_PADDING))
 
 		self.m_foldersListFrame = tk.Frame(self.m_mainLayout, bg='white', bd=0)
@@ -51,30 +53,32 @@ class MainWindow(tk.Frame):
 		self.m_foldersList.bind('<Delete>', self.removeFolders)
 
 		self.m_foldersListScrollBar = ttk.Scrollbar(self.m_foldersListFrame, orient=tk.VERTICAL)
-		self.m_foldersListScrollBar.config(command=self.m_foldersList.yview)  # Scrollbar moves Listbox
+		self.m_foldersListScrollBar['command'] = self.m_foldersList.yview  # Scrollbar moves Listbox
 		self.m_foldersListScrollBar.pack(side=tk.RIGHT, fill=tk.Y)
-		self.m_foldersList['yscrollcommand'] = self.m_foldersListScrollBar.set # Listbox moves Scrollbar
+		self.m_foldersList['yscrollcommand'] = self.m_foldersListScrollBar.set  # Listbox moves Scrollbar
 
 		self.m_buttonsLayout = tk.Frame(self.m_mainLayout)
 		self.m_buttonsLayout.pack(fill=tk.X)
 
 		self.m_removeFolderButton = ttk.Button(self.m_buttonsLayout, text='-')
+		self.m_removeFolderButton['command'] = self.removeFolders
 		self.m_removeFolderButton.pack(side=tk.RIGHT)
-		self.m_removeFolderButton.bind('<Button-1>', self.removeFolders)
 
 		self.m_addFolderButton = ttk.Button(self.m_buttonsLayout, text='+')
+		self.m_addFolderButton['command'] = self.addFolder
 		self.m_addFolderButton.pack(side=tk.RIGHT)
-		self.m_addFolderButton.bind('<Button-1>', self.addFolder)
 
-		self.m_startSearchButton = ttk.Button(self.m_mainLayout, text=tr.START_SEARCH_BUTTON)
+		self.m_startSearchButton = ttk.Button(self.m_mainLayout, text=tr.MW_START_SEARCH_BUTTON)
+		self.m_startSearchButton['command'] = self.startSearch
 		self.m_startSearchButton.pack(fill=tk.X)
-		self.m_startSearchButton.bind('<Button-1>', self.startSearch)
+
+		self.updateButtonsState()
 
 	def addFolder(self, event=None):
 		# Get either user directory or last folder opened if any
 		initialdir = self.m_lastFolder or os.path.expanduser('~')
 
-		folder = filedialog.askdirectory(initialdir=initialdir, title=tr.SELECT_FOLDER_DIALOG_TITLE)
+		folder = filedialog.askdirectory(initialdir=initialdir, title=tr.MW_DIALOG_TITLE)
 
 		if folder is None or folder == '':
 			return
@@ -82,20 +86,20 @@ class MainWindow(tk.Frame):
 		for f in self.m_folders:
 			# Same folder already added
 			if folder == f:
-				messagebox.showinfo(title=tr.SELECT_FOLDER_ERROR_ALREADY_IN_LIST_DIALOG_TITLE,
-				                    message=tr.SELECT_FOLDER_ERROR_ALREADY_IN_LIST_DIALOG_MESSAGE)
+				messagebox.showwarning(title=tr.MW_ERROR_ALREADY_IN_LIST_DIALOG_TITLE,
+				                       message=tr.MW_ERROR_ALREADY_IN_LIST_DIALOG_MESSAGE)
 				return
 
 			# Child of folder already added
 			if folder.startswith(f):
-				messagebox.showinfo(title=tr.SELECT_FOLDER_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_TITLE,
-				                    message=tr.SELECT_FOLDER_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_MESSAGE)
+				messagebox.showwarning(title=tr.MW_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_TITLE,
+				                       message=tr.MW_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_MESSAGE)
 				return
 
 			# Parent of folder already added -> Remove children
 			if f.startswith(folder):
-				if messagebox.askyesno(title=tr.SELECT_FOLDER_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_TITLE,
-				                       message=tr.SELECT_FOLDER_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_MESSAGE):
+				if messagebox.askyesno(title=tr.MW_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_TITLE,
+				                       message=tr.MW_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_MESSAGE):
 					self.removeChildrenOfFolder(folder)
 					break
 				else:
@@ -121,6 +125,8 @@ class MainWindow(tk.Frame):
 
 		self.m_foldersFormattedName.append(folder)
 		self.m_foldersList.insert(tk.END, folder)
+
+		self.updateButtonsState()
 
 	def removeChildrenOfFolder(self, folder):
 		foldersToRemove = []
@@ -159,6 +165,7 @@ class MainWindow(tk.Frame):
 			self.m_foldersFormattedName.remove(f)
 
 		self.rebuildFoldersList()
+		self.updateButtonsState()
 
 	def rebuildFoldersList(self):
 		"""Clears the folder list display and re-fills it properly"""
@@ -167,5 +174,26 @@ class MainWindow(tk.Frame):
 		for f in self.m_foldersFormattedName:
 			self.m_foldersList.insert(tk.END, f)
 
+	def updateButtonsState(self):
+		if not self.m_folders:
+			self.m_startSearchButton['state'] = tk.DISABLED
+			self.m_removeFolderButton['state'] = tk.DISABLED
+		else:
+			self.m_startSearchButton['state'] = tk.NORMAL
+			self.m_removeFolderButton['state'] = tk.NORMAL
+
 	def startSearch(self, event=None):
-		print('start search')
+		if not self.m_folders:
+			return
+
+		searchWindow = SearchWindow(tk.Toplevel(self))
+		searchWindow.pack()
+		searchWindow.startProcessing(self.m_folders)
+
+
+if __name__ == '__main__':
+	root = tk.Tk()
+	root.tk_setPalette(background='#ececec')
+	mw = MainWindow(root)
+	mw.pack()
+	mw.mainloop()

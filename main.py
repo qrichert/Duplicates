@@ -14,7 +14,7 @@ class App(tk.Frame):
 		self.m_parent.bind('<Escape>', self.appQuit)  # Link Esc to quit function
 
 		self.m_parent.title('Duplicates')  # Window title
-		# self.parent.resizable(False, False)  # Not resizable
+		self.m_parent.resizable(False, False)  # Not resizable
 
 		self.m_parent.tk_setPalette(background='#ececec')  # Main widget background color
 
