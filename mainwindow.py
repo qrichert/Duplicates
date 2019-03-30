@@ -1,11 +1,6 @@
 """
-Main window class
-
-To-do:
-- If a folder is selected, give the option to add another one.
-  With two folders you don't need to crawl the whole system
-  if you know where to look.
-- Maybe even make a list of folders to crawl with "+" and "-"
+Main window class :
+Add and delete folders from list
 """
 
 import os
@@ -21,6 +16,7 @@ if LANG == 'fr':
 	import translation.fr as tr
 else:  # English is default
 	import translation.en as tr
+
 
 class MainWindow(tk.Frame):
 	def __init__(self, parent):
@@ -50,12 +46,17 @@ class MainWindow(tk.Frame):
 		self.m_foldersList['selectbackground'] = '#2257c9'
 		self.m_foldersList['selectforeground'] = 'white'
 		self.m_foldersList['selectborderwidth'] = 0
-		self.m_foldersList.pack(fill=tk.BOTH, padx=2, pady=2)
+		self.m_foldersList.pack(side=tk.LEFT, fill=tk.BOTH, padx=2, pady=2)
 		self.m_foldersList.bind('<BackSpace>', self.removeFolders)
 		self.m_foldersList.bind('<Delete>', self.removeFolders)
 
+		self.m_foldersListScrollBar = ttk.Scrollbar(self.m_foldersListFrame, orient=tk.VERTICAL)
+		self.m_foldersListScrollBar.config(command=self.m_foldersList.yview)  # Scrollbar moves Listbox
+		self.m_foldersListScrollBar.pack(side=tk.RIGHT, fill=tk.Y)
+		self.m_foldersList['yscrollcommand'] = self.m_foldersListScrollBar.set # Listbox moves Scrollbar
+
 		self.m_buttonsLayout = tk.Frame(self.m_mainLayout)
-		self.m_buttonsLayout.pack(side=tk.RIGHT)
+		self.m_buttonsLayout.pack(fill=tk.X)
 
 		self.m_removeFolderButton = ttk.Button(self.m_buttonsLayout, text='-')
 		self.m_removeFolderButton.pack(side=tk.RIGHT)
@@ -64,6 +65,10 @@ class MainWindow(tk.Frame):
 		self.m_addFolderButton = ttk.Button(self.m_buttonsLayout, text='+')
 		self.m_addFolderButton.pack(side=tk.RIGHT)
 		self.m_addFolderButton.bind('<Button-1>', self.addFolder)
+
+		self.m_startSearchButton = ttk.Button(self.m_mainLayout, text=tr.START_SEARCH_BUTTON)
+		self.m_startSearchButton.pack(fill=tk.X)
+		self.m_startSearchButton.bind('<Button-1>', self.startSearch)
 
 	def addFolder(self, event=None):
 		# Get either user directory or last folder opened if any
@@ -161,3 +166,6 @@ class MainWindow(tk.Frame):
 
 		for f in self.m_foldersFormattedName:
 			self.m_foldersList.insert(tk.END, f)
+
+	def startSearch(self, event=None):
+		print('start search')

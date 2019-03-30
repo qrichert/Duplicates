@@ -11,4 +11,5 @@ SELECT_FOLDER_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_TITLE = 'Parent already select
 SELECT_FOLDER_ERROR_PARENT_ALREADY_IN_LIST_DIALOG_MESSAGE = "This folder's parent has already been selected."
 SELECT_FOLDER_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_TITLE = 'Children already selected'
 SELECT_FOLDER_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_MESSAGE = 'Children of this folder have already been selected.' \
-                                                              'Do you want to remove them? '
+                                                              'Do you want to remove them?'
+START_SEARCH_BUTTON = 'Search'
