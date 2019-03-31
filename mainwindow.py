@@ -181,8 +181,7 @@ class MainWindow(tk.Frame):
 		if not self.m_folders:
 			return
 
-		searchWindow = SearchWindow(tk.Toplevel(self))
-		searchWindow.pack()
+		searchWindow = SearchWindow(self)
 		searchWindow.startProcessing(self.m_folders)
 
 
