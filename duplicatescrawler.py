@@ -19,12 +19,18 @@ import threading
 import os
 import hashlib
 
+
+class ThreadEndRequested(Exception):
+	pass
+
+
 class DuplicatesCrawler(threading.Thread):
 	def __init__(self, parent, folders):
 		threading.Thread.__init__(self)
 
 		self.m_parent = parent
 		self.m_folders = folders
+		self.m_requestThreadEnd = False
 
 	def run(self):
 		# Dictionaries are more efficient than lists, especially large ones
@@ -46,6 +52,10 @@ class DuplicatesCrawler(threading.Thread):
 			for dirpath, dirnames, filenames in os.walk(folder):
 				# For each file in the directory
 				for fileName in filenames:
+					if self.m_requestThreadEnd is True:
+						print('Kill request at step 1')
+						return
+
 					fullPath = os.path.join(dirpath, fileName)
 					try:
 						# Replace symlinks by real file & Get file size
@@ -73,9 +83,13 @@ class DuplicatesCrawler(threading.Thread):
 				continue
 
 			for fullPath in files:
+				if self.m_requestThreadEnd is True:
+					print('Kill request at step 2')
+					return
+
 				try:
 					smallHash = self.getFileHash(fullPath, firstChunkOnly=True)
-				except (OSError,):
+				except (OSError, ThreadEndRequested):
 					# File access & shit
 					continue
 
@@ -93,9 +107,12 @@ class DuplicatesCrawler(threading.Thread):
 				continue
 
 			for fullPath in files:
+				if self.m_requestThreadEnd is True:
+					return
+
 				try:
 					fullHash = self.getFileHash(fullPath)
-				except (OSError,):
+				except (OSError, ThreadEndRequested):
 					continue
 
 				duplicate = hashesByFile.get(fullHash)
@@ -108,15 +125,22 @@ class DuplicatesCrawler(threading.Thread):
 		# Final step, cleaning the dictionary
 		keysToRemove = []
 		for key, files in hashesByFile.items():
+			if self.m_requestThreadEnd is True:
+				return
+
 			if len(files) < 2:
 				keysToRemove.append(key)
 
 		for key in keysToRemove:
+			if self.m_requestThreadEnd is True:
+				return
+
 			if key in hashesByFile:
 				del hashesByFile[key]  # del does not return the value like pop()
 
-		# Contains duplicates sorted by hash
-		self.m_parent.processingEnded(hashesByFile)
+		if self.m_requestThreadEnd is False:
+			# Contains duplicates sorted by hash
+			self.m_parent.processingEnded(hashesByFile)
 
 	def getFileHash(self, fileName, firstChunkOnly=False, chunkSize=1024):
 		hashObj = hashlib.sha1()
@@ -136,12 +160,25 @@ class DuplicatesCrawler(threading.Thread):
 
 	def readFileByChunk(self, fileObj, chunkSize):
 		while True:
+			if self.m_requestThreadEnd is True:
+				raise ThreadEndRequested
+
 			# At each iteration we read the next chunk of chunkSize bytes
 			chunk = fileObj.read(chunkSize)
+
 			# If chunk is empty we have read the whole file and return
 			if not chunk:
 				return
+
 			# yield returns the value of the chunk without terminating the function
 			# Each yield is read as an item of an array in for chunk in self.readFileByChunk(fileObj, chunkSize):
 			# The benefit over returning a list is that we only keep a chunk in memory, and not an entire file
 			yield chunk
+
+	def terminate(self):
+		"""
+		Threads can't be terminated, so we fake it using self.m_requestThreadEnd.
+		At every stage of the process, we check self.m_requestThreadEnd and quit
+		if it is set to True.
+		"""
+		self.m_requestThreadEnd = True

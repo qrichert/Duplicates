@@ -14,8 +14,14 @@ MW_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_TITLE = 'Children already selected'
 MW_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_MESSAGE = 'Children of this folder have already been selected.' \
                                                               'Do you want to remove them?'
 MW_START_SEARCH_BUTTON = 'Search'
+MW_SEARCH_END_NO_DUPLICATES_DIALOG_TITLE = 'No Duplicates'
+MW_SEARCH_END_NO_DUPLICATES_DIALOG_MESSAGE = 'There are no duplicate files in the selected folders'
 
 # Search Window
 SW_TITLE = 'Processing...'
 SW_STATUS_LABEL = 'Processing files...'
 SW_CANCEL_BUTTON = 'Cancel'
+
+# Duplicates Window
+DW_TITLE = 'Files List'
+DW_CLOSE_BUTTON = 'Close'

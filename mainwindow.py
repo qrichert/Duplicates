@@ -1,6 +1,10 @@
 """
 Main window class :
 Add and delete folders from list
+
+TODO: Update SearchWindow as crawling goes on.
+ STEP-FILES like 1-8765 or 3-7
+ Otherwise the user may think it has crashed if nothing goes on for a while
 """
 
 import os
@@ -11,6 +15,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 from searchwindow import *
+from duplicateswindow import *
 
 from lang import *
 
@@ -181,8 +186,16 @@ class MainWindow(tk.Frame):
 		if not self.m_folders:
 			return
 
-		searchWindow = SearchWindow(self)
-		searchWindow.startProcessing(self.m_folders)
+		searchWindow = SearchWindow(self, self.m_folders)
+		searchWindow.startProcessing()
+
+	def searchResult(self, duplicates):
+		if not duplicates or len(duplicates) == 0:
+			messagebox.showinfo(title=tr.MW_SEARCH_END_NO_DUPLICATES_DIALOG_TITLE,
+			                    message=tr.MW_SEARCH_END_NO_DUPLICATES_DIALOG_MESSAGE)
+			return
+
+		duplicatesWindow = DuplicatesWindow(self, duplicates)
 
 
 if __name__ == '__main__':

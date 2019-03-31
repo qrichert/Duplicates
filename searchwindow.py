@@ -7,7 +7,7 @@ from lang import *
 
 
 class SearchWindow(tk.Toplevel):
-	def __init__(self, parent):
+	def __init__(self, parent, folders):
 		tk.Toplevel.__init__(self, parent)
 
 		# Constants
@@ -15,7 +15,8 @@ class SearchWindow(tk.Toplevel):
 
 		# Attributes
 		self.m_parent = parent
-		self.m_progress = 100
+		self.m_folders = folders
+		self.m_duplicatesCrawler = DuplicatesCrawler(self, self.m_folders)
 
 		# Window configuration
 		self.protocol('WM_DELETE_WINDOW', self.cancelProcessing)  # Override default 'Quit Cross' behaviour
@@ -39,23 +40,21 @@ class SearchWindow(tk.Toplevel):
 		self.m_progressBar = ttk.Progressbar(self.m_mainLayout, mode='indeterminate', length=270)
 		self.m_progressBar['maximum'] = 100
 		self.m_progressBar['value'] = 100
-		self.m_progressBar['variable'] = self.m_progress
 		self.m_progressBar.pack(fill=tk.X)
 
 		self.m_cancelButton = ttk.Button(self.m_mainLayout, text=tr.SW_CANCEL_BUTTON)
 		self.m_cancelButton['command'] = self.cancelProcessing
 		self.m_cancelButton.pack(pady=(self.DEFAULT_PADDING, 0))
 
-	def startProcessing(self, folders):
-		thread = DuplicatesCrawler(self, folders)
-		thread.start()
+	def startProcessing(self):
+		self.m_duplicatesCrawler.start()
 
 	def cancelProcessing(self, event=None):
-		print('stop')
+		self.m_duplicatesCrawler.terminate()
 		self.destroy()
 
 	def processingEnded(self, duplicates):
-		print(duplicates)
+		self.m_parent.searchResult(duplicates)
 		self.destroy()
 
 if __name__ == '__main__':
