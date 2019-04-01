@@ -63,7 +63,7 @@ class DuplicatesCrawler(threading.Thread):
 						# Replace symlinks by real file & Get file size
 						fullPath = os.path.realpath(fullPath)
 						fileSize = os.path.getsize(fullPath)
-					except (OSError,):
+					except OSError:
 						# File cannot be accessed or whatever
 						continue
 
