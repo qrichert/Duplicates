@@ -44,16 +44,18 @@ class DuplicatesCrawler(threading.Thread):
 		hashesByFile = {}
 
 		# 1st Pass: By File Size
+		i = 0  # Number of files processed
+		self.m_parent.updateStatus(step=1, progress=0)
 		for folder in self.m_folders:
 			# os.walk(): Lists files in a folder recursively (one iteration for the given folder + 1 for each sub folder, etc.)
 			# dirpath = Path of current directory (one per iteration)
 			# dirnames = Names of folders in that directory
 			# filenames = Names of files in that directory
+
 			for dirpath, dirnames, filenames in os.walk(folder):
 				# For each file in the directory
 				for fileName in filenames:
 					if self.m_requestThreadEnd is True:
-						print('Kill request at step 1')
 						return
 
 					fullPath = os.path.join(dirpath, fileName)
@@ -71,21 +73,34 @@ class DuplicatesCrawler(threading.Thread):
 					if not duplicate:
 						hashesBySize[fileSize] = []  # Create a list of files that have that size
 
-					hashesBySize[fileSize].append(
-						fullPath)  # And append the current file to the dictionary, indexed by file size
+					hashesBySize[fileSize].append(fullPath)  # And append the current file to the dictionary, indexed by file size
+
+					# Updating status
+					i += 1  # One more file
+					self.m_parent.updateStatus(step=1, progress=i)
+
+		nbFilesProcessed = i
 
 		# 2nd Pass: By 1st kb Hash
 		# dictionary.items() returns a list of tuples (key, value)
 		# Every iteration is a list of files having the same size (__ = (unused) size)
+		i = 0
+		nbFilesToProcess = sum(len(files) for __, files in hashesBySize.items())
+		self.m_parent.updateStatus(step=2, progress=0, total=nbFilesToProcess)
 		for __, files in hashesBySize.items():
 			# Single files have no duplicates
 			if len(files) < 2:
+				i += 1
+				self.m_parent.updateStatus(step=2, progress=i, total=nbFilesToProcess)
 				continue
 
 			for fullPath in files:
 				if self.m_requestThreadEnd is True:
-					print('Kill request at step 2')
 					return
+
+				# Updating status
+				i += 1  # One more file
+				self.m_parent.updateStatus(step=2, progress=i, total=nbFilesToProcess)
 
 				try:
 					smallHash = self.getFileHash(fullPath, firstChunkOnly=True)
@@ -102,13 +117,22 @@ class DuplicatesCrawler(threading.Thread):
 
 		# 3rd Pass: By File Hash
 		# Same as 2nd pass, only for entire file instead of chunk
+		i = 0
+		nbFilesToProcess = sum(len(files) for __, files in hashesByFirstKB.items())
+		self.m_parent.updateStatus(step=3, progress=0, total=nbFilesToProcess)
 		for __, files in hashesByFirstKB.items():
 			if len(files) < 2:
+				i += len(files)
+				self.m_parent.updateStatus(step=3, progress=i, total=nbFilesToProcess)
 				continue
 
 			for fullPath in files:
 				if self.m_requestThreadEnd is True:
 					return
+
+				# Updating status
+				i += 1  # One more file
+				self.m_parent.updateStatus(step=3, progress=i, total=nbFilesToProcess)
 
 				try:
 					fullHash = self.getFileHash(fullPath)
@@ -140,7 +164,7 @@ class DuplicatesCrawler(threading.Thread):
 
 		if self.m_requestThreadEnd is False:
 			# Contains duplicates sorted by hash
-			self.m_parent.processingEnded(hashesByFile)
+			self.m_parent.processingEnded(hashesByFile, nbFilesProcessed)
 
 	def getFileHash(self, fileName, firstChunkOnly=False, chunkSize=1024):
 		hashObj = hashlib.sha1()

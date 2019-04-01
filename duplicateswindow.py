@@ -5,7 +5,7 @@ from lang import *
 
 
 class DuplicatesWindow(tk.Toplevel):
-	def __init__(self, parent, duplicates):
+	def __init__(self, parent, duplicates, nbFilesProcessed):
 		tk.Toplevel.__init__(self, parent)
 
 		# Constants
@@ -14,6 +14,7 @@ class DuplicatesWindow(tk.Toplevel):
 		# Attributes
 		self.m_parent = parent
 		self.m_duplicates = duplicates
+		self.m_nbFilesProcessed = nbFilesProcessed
 
 		# Window configuration
 		self.protocol('WM_DELETE_WINDOW', self.closeDialog)  # Override default 'Quit Cross' behaviour
@@ -33,6 +34,13 @@ class DuplicatesWindow(tk.Toplevel):
 
 		self.m_text = tk.Text(self.m_mainLayout, bg='white', highlightthickness=0)
 		self.m_text.pack(fill=tk.X)
+
+		nbUniqueFiles = len(self.m_duplicates)
+		nbDuplicates = sum(len(duplicates) for __, duplicates in self.m_duplicates.items())
+
+		self.m_text.insert(tk.END, tr.DW_NB_FILES_PROCESSED.format(self.m_nbFilesProcessed) + '\n')
+		self.m_text.insert(tk.END, tr.DW_UNIQUE_FILES_AND_DUPLICATES.format(nbUniqueFiles, nbDuplicates) + '\n')
+		self.m_text.insert(tk.END, '--------------------------------------------------------------\n')
 
 		# Populating text field
 		for __, duplicates in self.m_duplicates.items():

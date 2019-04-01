@@ -15,13 +15,17 @@ MW_ERROR_CHILDREN_ALREADY_IN_LIST_DIALOG_MESSAGE = 'Children of this folder have
                                                               'Do you want to remove them?'
 MW_START_SEARCH_BUTTON = 'Search'
 MW_SEARCH_END_NO_DUPLICATES_DIALOG_TITLE = 'No Duplicates'
-MW_SEARCH_END_NO_DUPLICATES_DIALOG_MESSAGE = 'There are no duplicate files in the selected folders'
+MW_SEARCH_END_NO_DUPLICATES_DIALOG_MESSAGE = 'No duplicate files in the selected folders.\nFiles processed: {}'
 
 # Search Window
 SW_TITLE = 'Processing...'
-SW_STATUS_LABEL = 'Processing files...'
+SW_STATUS_LABEL_STEP_1 = 'Indexing files... ({})'
+SW_STATUS_LABEL_STEP_2 = 'Quick comparison ({}/{})'
+SW_STATUS_LABEL_STEP_3 = 'In-depth comparison ({}/{})'
 SW_CANCEL_BUTTON = 'Cancel'
 
 # Duplicates Window
 DW_TITLE = 'Files List'
 DW_CLOSE_BUTTON = 'Close'
+DW_NB_FILES_PROCESSED = 'Files processed: {}'
+DW_UNIQUE_FILES_AND_DUPLICATES = '{} file(s), {} duplicate(s).'
