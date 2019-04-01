@@ -34,7 +34,7 @@ class SearchWindow(tk.Toplevel):
 		self.m_mainLayout = tk.Frame(self)
 		self.m_mainLayout.pack(padx=self.DEFAULT_PADDING, pady=self.DEFAULT_PADDING)
 
-		self.m_statusLabel = tk.Label(self.m_mainLayout, text=tr.SW_STATUS_LABEL_STEP_1, anchor=tk.W)
+		self.m_statusLabel = tk.Label(self.m_mainLayout, text=tr.SW_STATUS_LABEL_STEP_1.format(0), anchor=tk.W)
 		self.m_statusLabel.pack(fill=tk.X, pady=0)
 
 		self.m_progressBar = ttk.Progressbar(self.m_mainLayout, length=270)
