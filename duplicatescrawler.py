@@ -83,11 +83,11 @@ class DuplicatesCrawler(threading.Thread):
 
 		# 2nd Pass: By 1st kb Hash
 		# dictionary.items() returns a list of tuples (key, value)
-		# Every iteration is a list of files having the same size (__ = (unused) size)
+		# Every iteration is a list of files having the same size (_ = (unused) size)
 		i = 0
-		nbFilesToProcess = sum(len(files) for __, files in hashesBySize.items())
+		nbFilesToProcess = sum(len(files) for _, files in hashesBySize.items())
 		self.m_parent.updateStatus(step=2, progress=0, total=nbFilesToProcess)
-		for __, files in hashesBySize.items():
+		for _, files in hashesBySize.items():
 			# Single files have no duplicates
 			if len(files) < 2:
 				i += 1
@@ -118,9 +118,9 @@ class DuplicatesCrawler(threading.Thread):
 		# 3rd Pass: By File Hash
 		# Same as 2nd pass, only for entire file instead of chunk
 		i = 0
-		nbFilesToProcess = sum(len(files) for __, files in hashesByFirstKB.items())
+		nbFilesToProcess = sum(len(files) for _, files in hashesByFirstKB.items())
 		self.m_parent.updateStatus(step=3, progress=0, total=nbFilesToProcess)
-		for __, files in hashesByFirstKB.items():
+		for _, files in hashesByFirstKB.items():
 			if len(files) < 2:
 				i += len(files)
 				self.m_parent.updateStatus(step=3, progress=i, total=nbFilesToProcess)
