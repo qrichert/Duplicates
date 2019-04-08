@@ -51,14 +51,14 @@ class DuplicatesWindow(tk.Toplevel):
 		self.m_text['xscrollcommand'] = self.m_textHScrollbar.set
 
 		nbUniqueFiles = len(self.m_duplicates)
-		nbDuplicates = sum(len(duplicates) for _, duplicates in self.m_duplicates.items())
+		nbDuplicates = sum(len(duplicates) for duplicates in self.m_duplicates.values())
 
 		self.m_text.insert(tk.END, tr.DW_NB_FILES_PROCESSED.format(self.m_nbFilesProcessed) + '\n')
 		self.m_text.insert(tk.END, tr.DW_UNIQUE_FILES_AND_DUPLICATES.format(nbUniqueFiles, nbDuplicates) + '\n')
 		self.m_text.insert(tk.END, '--------------------------------------------------------------\n')
 
 		# Populating text field
-		for _, duplicates in self.m_duplicates.items():
+		for duplicates in self.m_duplicates.values():
 			for duplicate in duplicates:
 				self.m_text.insert(tk.END, duplicate + '\n')
 
