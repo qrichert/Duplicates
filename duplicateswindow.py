@@ -100,17 +100,17 @@ class DuplicatesWindow(tk.Toplevel):
 			return str(kb) + ' ' + tr.UNIT_KB
 
 		elif bytes < 1000 ** 3:  # Mb
-			mb = bytes / 1000 / 1000
+			mb = bytes / (1000 ** 2)
 			mb = round(mb, rounddigits)
 			return str(mb) + ' ' + tr.UNIT_MB
 
 		elif bytes < 1000 ** 4:  # Gb
-			gb = bytes / 1000 / 1000 / 1000
+			gb = bytes / (1000 ** 3)
 			gb = round(gb, rounddigits)
 			return str(gb) + ' ' + tr.UNIT_GB
 
 		else:
-			tb = bytes / 1000 / 1000 / 1000 / 1000
+			tb = bytes / (1000 ** 4)
 			tb = round(tb, rounddigits)
 			return str(tb) + ' ' + tr.UNIT_TB
 
