@@ -30,3 +30,12 @@ DW_TITLE = 'Liste des doublons'
 DW_CLOSE_BUTTON = 'Fermer'
 DW_NB_FILES_PROCESSED = 'Fichiers analysés : {}'
 DW_UNIQUE_FILES_AND_DUPLICATES = '{} fichier(s), {} doublon(s).'
+DW_SAVE_UP_TO_X_SPACE_TOTAL = "Économisez jusqu'à {} en supprimant les doublons."
+DW_SAVE_UP_TO_X_SPACE_GROUP = "Économisez jusqu'à {} en supprimant {} doublon(s)."
+
+#Units
+UNIT_BYTES = 'bits'
+UNIT_KB = 'Kb'
+UNIT_MB = 'Mb'
+UNIT_GB = 'Gb'
+UNIT_TB = 'Tb'

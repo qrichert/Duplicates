@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import os
 
 from lang import *
 
@@ -53,12 +54,33 @@ class DuplicatesWindow(tk.Toplevel):
 		nbUniqueFiles = len(self.m_duplicates)
 		nbDuplicates = sum(len(duplicates) for duplicates in self.m_duplicates.values())
 
+		totalDiskSpaceSavable = 0
+		diskSpaceSavableByGroupOfDuplicates = []
+
+		for duplicates in self.m_duplicates.values():
+			# Each pass = group (array of duplicates)
+
+			# nb of files - 1 (cause we usually want to keep one) * size of 1 file
+
+			diskSpace = (len(duplicates) - 1) * os.path.getsize(duplicates[0])
+
+			totalDiskSpaceSavable += diskSpace
+			diskSpaceSavableByGroupOfDuplicates.append(diskSpace)
+
+		totalDiskSpaceSavable = self.bytesToReadableSize(totalDiskSpaceSavable)
+
 		self.m_text.insert(tk.END, tr.DW_NB_FILES_PROCESSED.format(self.m_nbFilesProcessed) + '\n')
 		self.m_text.insert(tk.END, tr.DW_UNIQUE_FILES_AND_DUPLICATES.format(nbUniqueFiles, nbDuplicates) + '\n')
+		self.m_text.insert(tk.END, tr.DW_SAVE_UP_TO_X_SPACE_TOTAL.format(totalDiskSpaceSavable) + '\n')
 		self.m_text.insert(tk.END, '--------------------------------------------------------------\n')
 
 		# Populating text field
-		for duplicates in self.m_duplicates.values():
+		for i, duplicates in enumerate(self.m_duplicates.values()):
+			diskSpaceSavableForGroup = diskSpaceSavableByGroupOfDuplicates[i]  # bytes savable for this group
+			diskSpaceSavableForGroup = self.bytesToReadableSize(diskSpaceSavableForGroup)
+
+			self.m_text.insert(tk.END, tr.DW_SAVE_UP_TO_X_SPACE_GROUP.format(diskSpaceSavableForGroup, len(duplicates) - 1) + '\n')
+
 			for duplicate in duplicates:
 				self.m_text.insert(tk.END, duplicate + '\n')
 
@@ -68,6 +90,29 @@ class DuplicatesWindow(tk.Toplevel):
 		self.m_closeButton['command'] = self.closeDialog
 		self.m_closeButton.pack(padx=self.DEFAULT_PADDING, pady=self.DEFAULT_PADDING)
 
+	def bytesToReadableSize(self, bytes, rounddigits=2):
+		if bytes < 1000:  # bytes
+			return str(bytes) + ' ' + tr.UNIT_BYTES
+
+		elif bytes < 1000 ** 2:  # Kb
+			kb = bytes / 1000
+			kb = round(kb, rounddigits)
+			return str(kb) + ' ' + tr.UNIT_KB
+
+		elif bytes < 1000 ** 3:  # Mb
+			mb = bytes / 1000 / 1000
+			mb = round(mb, rounddigits)
+			return str(mb) + ' ' + tr.UNIT_MB
+
+		elif bytes < 1000 ** 4:  # Gb
+			gb = bytes / 1000 / 1000 / 1000
+			gb = round(gb, rounddigits)
+			return str(gb) + ' ' + tr.UNIT_GB
+
+		else:
+			tb = bytes / 1000 / 1000 / 1000 / 1000
+			tb = round(tb, rounddigits)
+			return str(tb) + ' ' + tr.UNIT_TB
 
 	def closeDialog(self, event=None):
 		self.destroy()

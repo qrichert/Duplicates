@@ -30,3 +30,12 @@ DW_TITLE = 'Duplicate Files List'
 DW_CLOSE_BUTTON = 'Close'
 DW_NB_FILES_PROCESSED = 'Files processed: {}'
 DW_UNIQUE_FILES_AND_DUPLICATES = '{} file(s), {} duplicate(s).'
+DW_SAVE_UP_TO_X_SPACE_TOTAL = 'Save up to {} by deleting duplicates.'
+DW_SAVE_UP_TO_X_SPACE_GROUP = 'Save up to {} by deleting {} duplicate(s).'
+
+#Units
+UNIT_BYTES = 'bytes'
+UNIT_KB = 'Kb'
+UNIT_MB = 'Mb'
+UNIT_GB = 'Gb'
+UNIT_TB = 'Tb'
