@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ABSPATH=$(cd "$(dirname "$0")"; pwd)
-python3 "$ABSPATH/main.py"
+nohup python3 $ABSPATH/main.py </dev/null >/dev/null 2>&1 &
