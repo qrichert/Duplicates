@@ -10,7 +10,7 @@ and how much space you can save by deleting them.
 
 <p align="center">
 	<a href="#" target="_blank">
-		<img src="https://drive.quentinrichert.com/files/duplicates.png"
+		<img src="duplicates.png"
 			 width="427"
 			 height="401">
 	</a>
